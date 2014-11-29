@@ -34,9 +34,12 @@ router.get('/', function(req, res) {
 	res.json({ message: 'hooray! welcome to our api!' });	
 });
 
-router.route('/scores').
-	get(function(req, res){
-		var query = User.find({}).sort({currentHighscore: -1}).limit(10).sort({currentHighscore: 'desc'});
+router.route('/scores')
+	.options(function(req, res){
+		res.header("Access-Control-Allow-Origin", "*");
+	})
+	.get(function(req, res){
+		var query = User.find({}).sort({currentHighscore: -1}).limit(10);
 		query.select('currentHighscore username');
 		query.exec(function(err, scores){
 			res.header('Access-Control-Allow-Origin', '*');
@@ -48,6 +51,7 @@ router.route('/score/:username')
 	.options(function(req, res){
 		res.header("Access-Control-Allow-Origin", "*");
 		res.header("Access-Control-Allow-Methods", "PUT,DELETE");
+		res.header('Access-Control-Allow-Headers', 'Content-Type');
 		res.json({message:'work'});
 	})
 	.put(function(req, res){
@@ -108,10 +112,14 @@ router.route('/position/:username').
 // on routes that end in /users
 // ----------------------------------------------------
 router.route('/users')
-
+	.options(function(req, res){
+		res.header("Access-Control-Allow-Origin", "*");
+		res.header('Access-Control-Allow-Headers', 'Content-Type');
+		res.header("Access-Control-Allow-Methods", "POST, GET");
+		res.json({message:'work'});
+	})
 	// create a user (accessed at POST http://localhost:8080/users)
 	.post(function(req, res) {
-
 		User.find({username: req.body.newUsername}, function(err, user) {
 			if (err){
 				res.send(err);
@@ -123,7 +131,7 @@ router.route('/users')
 					if (err) {
 						res.send(err);
 					}else {
-						res.header("Access-Control-Allow-Origin", "*");
+						res.header('Access-Control-Allow-Origin', '*');
 						res.json({ created: true });	
 					}
 					
